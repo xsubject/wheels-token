@@ -663,8 +663,8 @@ contract WheelsToken is Ownable {
         uint256 pairAmount = 0;
         if (!_inSwap) {
             if (recipient == _pairAddress || sender == _pairAddress) {
-                pairAmount = amount.div(100).mul(3);
-                marketingAmount = amount.div(100).mul(2);
+                pairAmount = amount.div(100).mul(2);
+                marketingAmount = amount.div(100).mul(3);
                 recipientAmount = amount.sub(pairAmount).sub(marketingAmount);
             } else if (_pairAddress != address(0)) {
                 _swap(_otherToken);
