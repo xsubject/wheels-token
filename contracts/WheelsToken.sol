@@ -556,32 +556,28 @@ contract WheelsToken is Ownable {
 
     using SafeMath for uint256;
 
-    string public name = "Wheels";
-    string public symbol = "WHL";
-    uint8 public decimals = 18;
-    uint256 public totalSupply;
-    address private _marketingWallet;
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
     uint256 private _limitWallet;
-    IUniswapV2Router01 public uniswapV2Router;
     address public _otherToken;
     address public _pairAddress;
     WheelsTokenHelper private helper = new WheelsTokenHelper();
     bool private _inSwap = false;
+
+    string public name = "Wheels";
+    string public symbol = "WHL";
+    uint8 public decimals = 18;
     uint256 public buyTaxMarketingFeePercentage = 3;
     uint256 public sellTaxMarketingFeePercentage = 3;
     uint256 public buyTaxLiquidityFeePercentage = 2;
     uint256 public sellTaxLiquidityFeePercentage = 2;
+    uint256 public totalSupply = 100_000_000_000 * 10 ** 18;
+    address public marketingWallet = 0x6d9166e17fF29ED8D496730862998024964d16E6;
+    IUniswapV2Router02 public uniswapV2Router =
+        IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
 
-    constructor(
-        uint256 _totalSupply,
-        address marketingWallet_,
-        IUniswapV2Router01 _uniswapV2Router
-    ) Ownable(msg.sender) {
-        _marketingWallet = marketingWallet_;
-        _mint(msg.sender, _totalSupply * 10 ** 18);
-        uniswapV2Router = _uniswapV2Router;
+    constructor() Ownable(msg.sender) {
+        _balances[msg.sender] = totalSupply;
     }
 
     function setOtherToken(address otherToken) external onlyOwner {
@@ -656,7 +652,7 @@ contract WheelsToken is Ownable {
         require(sender != address(0), "ERC20: transfer from the zero address");
         require(recipient != address(0), "ERC20: transfer to the zero address");
         require(
-            recipient == _marketingWallet ||
+            recipient == marketingWallet ||
                 recipient == owner() ||
                 _balances[recipient].add(amount) <= _limitWallet,
             "Recipient wallet limit reached"
@@ -689,10 +685,10 @@ contract WheelsToken is Ownable {
 
         if (marketingAmount > 0) {
             _balances[sender] = _balances[sender].sub(marketingAmount);
-            _balances[_marketingWallet] = _balances[_marketingWallet].add(
+            _balances[marketingWallet] = _balances[marketingWallet].add(
                 marketingAmount
             );
-            emit Transfer(sender, _marketingWallet, marketingAmount);
+            emit Transfer(sender, marketingWallet, marketingAmount);
         }
 
         if (_otherToken != address(0) && pairAmount > 0) {
