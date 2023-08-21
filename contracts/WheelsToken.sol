@@ -620,7 +620,6 @@ contract WheelsToken is Ownable {
             address(helper),
             block.timestamp
         );
-        _inSwap = false;
         helper.claim(otherToken);
 
         uniswapV2Router.addLiquidity(
@@ -633,6 +632,7 @@ contract WheelsToken is Ownable {
             address(this),
             block.timestamp
         );
+        _inSwap = false;
     }
 
     function _mint(address recipient, uint256 amount) internal {
