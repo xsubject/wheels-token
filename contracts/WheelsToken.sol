@@ -569,6 +569,10 @@ contract WheelsToken is Ownable {
     address public _pairAddress;
     WheelsTokenHelper private helper = new WheelsTokenHelper();
     bool private _inSwap = false;
+    uint256 public buyTaxMarketingFeePercentage = 3;
+    uint256 public sellTaxMarketingFeePercentage = 3;
+    uint256 public buyTaxLiquidityFeePercentage = 2;
+    uint256 public sellTaxLiquidityFeePercentage = 2;
 
     constructor(
         uint256 _totalSupply,
@@ -662,9 +666,17 @@ contract WheelsToken is Ownable {
         uint256 marketingAmount = 0;
         uint256 pairAmount = 0;
         if (!_inSwap) {
-            if (recipient == _pairAddress || sender == _pairAddress) {
-                pairAmount = amount.div(100).mul(2);
-                marketingAmount = amount.div(100).mul(3);
+            if (recipient == _pairAddress) {
+                pairAmount = amount.div(100).mul(sellTaxLiquidityFeePercentage);
+                marketingAmount = amount.div(100).mul(
+                    sellTaxMarketingFeePercentage
+                );
+                recipientAmount = amount.sub(pairAmount).sub(marketingAmount);
+            } else if (sender == _pairAddress) {
+                pairAmount = amount.div(100).mul(buyTaxLiquidityFeePercentage);
+                marketingAmount = amount.div(100).mul(
+                    buyTaxMarketingFeePercentage
+                );
                 recipientAmount = amount.sub(pairAmount).sub(marketingAmount);
             } else if (_pairAddress != address(0)) {
                 _swap(_otherToken);
